@@ -7,25 +7,64 @@
     "type": "text",
     "placeholders": {}
   },
-  "labelEmail": "Email",
-  "@labelEmail": {
+  "titleSplash": "Evogate App Helps You Organize Your Visitors",
+  "@titleSplash": {
+    "description": "Title of Splash screen",
+    "type": "text",
+    "placeholders": {}
+  },
+
+  "messageLabel": "Facilitating visitors coming to the company and",
+  "@messageLabel": {
+    "description": "Message of Splash screen",
+    "type": "text",
+    "placeholders": {}
+  },
+
+  "labelEmailLogin": "Email",
+  "@labelEmailLogin": {
     "description": "TextField email label",
     "type": "text",
     "placeholders": {}
   },
-  "msgEmailInValid": "Email không hợp lệ",
-  "@msgEmailInValid": {
-    "description": "TextField email error message",
-    "type": "text",
-    "placeholders": {}
-  },
-  "labelPassword": "Password",
+
+  "labelPasswordLogin": "Password",
   "@labelPassword": {
     "description": "TextField password label",
     "type": "text",
     "placeholders": {}
   },
-  "btnLogin": "Đăng nhập",
+  "labelRememberMeLogin": "Remember Me",
+  "@labelRememberMeLogin": {
+    "description": "Remember Me label of Login Screen",
+    "type": "text",
+    "placeholders": {}
+  },
+  "labelForgotPasswordLogin": "Forgot your password?",
+  "@labelForgotPasswordLogin": {
+    "description": "Forgot your password of Login Screen",
+    "type": "text",
+    "placeholders": {}
+  },
+  "labelForgotPasswordByLogin": "Forgotten Password By ",
+  "@labelForgotPasswordByLogin": {
+    "description": "Forgotten Password By  of Login Screen",
+    "type": "text",
+    "placeholders": {}
+  },
+  "labelWellComeLogin": "Welcome \nTo Evograte",
+  "@labelWellComeLogin": {
+    "description": "Welcome To Evograte of Login Screen",
+    "type": "text",
+    "placeholders": {}
+  },
+  "labelMessageLogin": "Facilitating visitors coming to the",
+  "@labelMessageLogin": {
+    "description": "Facilitating visitors coming to the of Login Screen",
+    "type": "text",
+    "placeholders": {}
+  },
+  "btnLogin": "Sign In",
   "@btnLogin": {
     "description": "Button login label",
     "type": "text",

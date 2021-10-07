@@ -6,17 +6,17 @@ import 'package:makerequest/utils/app_style.dart';
 // ignore: must_be_immutable
 class WTextRounded extends BaseStateless {
   WTextRounded({
-    Key key,
+    Key? key,
     this.text,
     this.color,
     this.background,
     this.textStyle,
-  }) : super(key: key);
+  }) : super(key: key!);
 
-  final String text;
-  final Color color;
-  final Color background;
-  final TextStyle textStyle;
+  final String? text;
+  final Color? color;
+  final Color? background;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class WTextRounded extends BaseStateless {
       child: Text(
         text ?? '',
         textAlign: TextAlign.center,
-        style: textStyle ?? boldTextStyle(15.SP, color: color),
+        style: textStyle ?? boldTextStyle(15.SP, color: color!),
       ),
     );
   }

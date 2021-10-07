@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class WButtonCircle extends StatelessWidget {
-  const WButtonCircle({Key key, this.width, this.onPressed, this.child, this.color}) : super(key: key);
+  const WButtonCircle({Key? key, this.width, this.onPressed, this.child, this.color}) : super(key: key);
 
-  final double width;
-  final Function() onPressed;
-  final Widget child;
-  final Color color;
+  final double? width;
+  final Function()? onPressed;
+  final Widget? child;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +14,7 @@ class WButtonCircle extends StatelessWidget {
       width: width ?? 50,
       height: width ?? 50,
       child: ElevatedButton(
+
         onPressed: onPressed,
         child: child,
         style: ElevatedButton.styleFrom(

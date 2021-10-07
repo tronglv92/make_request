@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:makerequest/generated/l10n.dart';
 import 'package:makerequest/pages/counter/counter_page.dart';
-import 'package:makerequest/pages/home/home_page.dart';
+import 'package:makerequest/pages/home/main_tab_page.dart';
 import 'package:makerequest/pages/home/home_provider.dart';
 import 'package:makerequest/pages/login/login_provider.dart';
 import 'package:makerequest/services/app/auth_provider.dart';

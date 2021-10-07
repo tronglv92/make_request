@@ -11,11 +11,11 @@ import 'package:makerequest/widgets/w_divider_line.dart';
 /// Use: final Duration duration = await WPickerDate.showPicker(context);
 
 class WPickerTime extends StatefulWidget {
-  const WPickerTime({Key key, this.initDuration}) : super(key: key);
+  const WPickerTime({Key? key, this.initDuration}) : super(key: key);
 
-  final Duration initDuration;
+  final Duration? initDuration;
 
-  static Future<Duration> showPicker(BuildContext context, {Duration initDuration}) {
+  static Future<Duration?> showPicker(BuildContext context, {Duration? initDuration}) {
     return showCupertinoModalPopup<Duration>(
         context: context,
         builder: (BuildContext context) {
@@ -72,11 +72,12 @@ class _WPickerTimeState extends BaseStateful<WPickerTime> {
                   style: normalTextStyle(17.SP, color: const Color(0xFF0080FA).withOpacity(isTimeValid ? 1 : 0.4)),
                 ),
               ),
-              onPressed: isTimeValid
+              onPressed: isTimeValid==true
                   ? () {
                       Navigator.of(context).pop(selected);
                     }
                   : null,
+
             ),
           ],
         ),

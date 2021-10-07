@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // View auto resized when keyboard open
 class WSysPadding extends StatelessWidget {
-  const WSysPadding({Key key, this.child}) : super(key: key);
+  const WSysPadding({Key? key,required this.child}) : super(key: key);
   final Widget child;
 
   @override

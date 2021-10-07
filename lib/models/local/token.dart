@@ -10,10 +10,10 @@ class Token {
 
   static const String localKey = 'token';
 
-  final String tokenType;
-  final int expiresIn;
-  final String accessToken;
-  final String refreshToken;
+  final String? tokenType;
+  final int? expiresIn;
+  final String? accessToken;
+  final String? refreshToken;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'token_type': tokenType,

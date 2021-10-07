@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class AppAssets {
   AppAssets._();
 
@@ -8,10 +10,20 @@ class AppAssets {
 
   ///#region FONTS
   /// -----------------
-  String fontRoboto = 'Roboto';
-  String fontLato = 'Lato';
-  String fontIOSDisplay = '.SF UI Display';
-  String fontIOSDefault = '.SF UI Text';
+  static String fontRoboto = 'Roboto';
+  static String fontLato = 'Lato';
+  static String fontIOSDisplay = '.SF UI Display';
+  static String fontIOSDefault = '.SF UI Text';
+
+  ///#endregion
+
+
+  ///#region COLORS
+  /// -----------------
+  static Color colorGrayOfText= const Color.fromRGBO(107, 104, 112, 1);
+  static Color colorGrayIcon= const Color.fromRGBO(235,	235,	235, 1);
+  static Color colorGrayBackGround= const Color.fromRGBO(244, 244, 247, 1);
+  static Color colorOrange=const Color.fromRGBO(222, 78, 42, 1);
 
   ///#endregion
 
@@ -25,5 +37,6 @@ class AppAssets {
   ///#region VIDEOS
   /// -----------------
   ///#endregion
+
 
 }

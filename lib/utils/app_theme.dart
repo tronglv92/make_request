@@ -26,7 +26,7 @@ class AppTheme {
   bool isDark = true;
   Color primaryColor = Colors.blueGrey;
   Color accentColor = Colors.blueGrey;
-  Color backgroundColor = const Color(0xFFF2F2F2);
+  Color backgroundColor =  Colors.white;
   Color headerBgColor = Colors.blueGrey;
 
   /// Build theme data
@@ -34,7 +34,7 @@ class AppTheme {
     return ThemeData(
       primaryColor: primaryColor,
       secondaryHeaderColor: accentColor,
-      fontFamily: assets.fontRoboto,
+      fontFamily: AppAssets.fontRoboto,
       pageTransitionsTheme: _buildPageTransitionsTheme(),
       buttonTheme: _buildButtonTheme(),
       textTheme: _buildTextTheme(),

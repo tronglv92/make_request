@@ -13,11 +13,11 @@ import 'package:provider/provider.dart';
 /// AppDialog.hide(context);
 ///
 class AppDialog {
-  BuildContext _dialogContext;
+  late BuildContext? _dialogContext;
   bool requestClose = false;
 
   /// Show alert dialog shortcut
-  static Future<void> show(BuildContext context, String content, {String title}) async {
+  static Future<void> show(BuildContext context, String content, {String? title}) async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
     return context.read<AppDialog>().showAlertDialog(context, content, title: title);
   }
@@ -28,13 +28,13 @@ class AppDialog {
   }
 
   // Show Alert Dialog
-  Future<void> showAlertDialog(BuildContext context, String content, {String title}) async {
+  Future<void> showAlertDialog(BuildContext context, String? content, {String? title}) async {
     return showAppDialog(
       context,
       CupertinoAlertDialog(
-        title: Text(title ?? 'Alert'),
+        title: Text(title ?? 'Alert ne '),
         content: SingleChildScrollView(
-          child: SelectableText(content ?? ''),
+          child: SelectableText(content??''),
         ),
         actions: <Widget>[
           TextButton(
@@ -49,14 +49,14 @@ class AppDialog {
   }
 
   /// Show alert dialog
-  Future<void> showAppDialog(BuildContext context, Widget body) async {
+  Future<void> showAppDialog(BuildContext context, Widget? body) async {
     hideAppDialog(isClean: true);
     showDialog<dynamic>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
         _dialogContext = dialogContext;
-        SchedulerBinding.instance.addPostFrameCallback((_) {
+        SchedulerBinding.instance?.addPostFrameCallback((_) {
           if (requestClose) {
             hideAppDialog();
           }
@@ -70,8 +70,8 @@ class AppDialog {
   void hideAppDialog({bool isClean = false}) {
     if (_dialogContext != null) {
       try {
-        if (Navigator.canPop(_dialogContext)) {
-          Navigator.pop(_dialogContext);
+        if (Navigator.canPop(_dialogContext!)) {
+          Navigator.pop(_dialogContext!);
         }
       } catch (e) {
         // Unhandled Exception: Looking up a deactivated widget's ancestor is unsafe.

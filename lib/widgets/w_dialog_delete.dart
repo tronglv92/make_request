@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:makerequest/services/safety/base_stateful.dart';
+import 'package:makerequest/utils/app_asset.dart';
 import 'package:makerequest/utils/app_extension.dart';
 import 'package:makerequest/utils/app_style.dart';
 import 'package:makerequest/widgets/w_dialog_alert.dart';
@@ -20,16 +21,16 @@ import 'package:makerequest/widgets/w_dialog_alert.dart';
 // });
 class WDialogDelete extends StatefulWidget {
   const WDialogDelete({
-    Key key,
+    Key? key,
     this.title,
     this.content,
     this.onCancelPressed,
     this.onDeletePressed,
   }) : super(key: key);
-  final String title;
-  final String content;
-  final Function() onCancelPressed;
-  final Function() onDeletePressed;
+  final String? title;
+  final String? content;
+  final Function()? onCancelPressed;
+  final Function()? onDeletePressed;
 
   @override
   _WDialogDeleteState createState() => _WDialogDeleteState();
@@ -40,14 +41,14 @@ class _WDialogDeleteState extends BaseStateful<WDialogDelete> {
   Widget build(BuildContext context) {
     super.build(context);
     return WDialogAlert(
-      title: widget.title,
-      content: widget.content,
+      title: widget?.title,
+      content: widget?.content,
       onCancelPressed: widget.onCancelPressed,
       confirmTitle: 'Delete',
       confirmTitleStyle: boldTextStyle(
         17.SP,
         color: const Color(0xFFFF453A),
-        fontFamily: appTheme.assets.fontIOSDefault,
+        fontFamily: AppAssets.fontIOSDefault,
       ),
       onConfirmPressed: widget.onDeletePressed,
     );

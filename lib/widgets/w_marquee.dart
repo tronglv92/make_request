@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 // ),
 class WMarquee extends StatefulWidget {
   const WMarquee({
-    @required this.child,
+    required this.child,
     this.padding,
     this.scrollDirection = Axis.horizontal,
     this.animationDuration = const Duration(milliseconds: 5000),
@@ -16,7 +16,7 @@ class WMarquee extends StatefulWidget {
   });
 
   final Widget child;
-  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry? padding;
   final Axis scrollDirection;
   final Duration animationDuration, backDuration, pauseDuration;
 
@@ -25,12 +25,12 @@ class WMarquee extends StatefulWidget {
 }
 
 class _WMarqueeState extends State<WMarquee> {
-  ScrollController scrollController;
+  late ScrollController scrollController;
 
   @override
   void initState() {
     scrollController = ScrollController(initialScrollOffset: 50.0);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
       scroll();
     });
     super.initState();

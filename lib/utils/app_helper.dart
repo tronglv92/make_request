@@ -1,10 +1,11 @@
-import 'package:flushbar/flushbar.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:makerequest/utils/app_extension.dart';
 
+// ignore: avoid_classes_with_only_static_members
 class AppHelper {
   /// Show normal bottom sheet
   /// final bool res = await AppHelper.showBottomSheet(context,
@@ -17,8 +18,8 @@ class AppHelper {
   //                ),
   //              );
   //       });
-  static Future<T> showBottomSheet<T>(BuildContext context, Widget Function(BuildContext context) child,
-      {double heightFactor, bool interactive = true}) {
+  static Future<T?> showBottomSheet<T>(BuildContext context, Widget Function(BuildContext context) child,
+      {double? heightFactor, bool interactive = true}) {
     return showModalBottomSheet<T>(
       context: context,
       isScrollControlled: true,
@@ -45,7 +46,7 @@ class AppHelper {
   //         (_, ScrollController scrollController) {
   //       return WSheet(scrollController: scrollController);
   //     });
-  static Future<T> showScrollableBottomSheet<T>(
+  static Future<T?> showScrollableBottomSheet<T>(
     BuildContext context,
     Widget Function(BuildContext context, ScrollController scrollController) child,
   ) {
@@ -76,7 +77,7 @@ class AppHelper {
   }
 
   /// Show popup
-  static Future<T> showPopup<T>(
+  static Future<T?> showPopup<T>(
     BuildContext context,
     Widget Function(BuildContext context) builder, {
     bool barrierDismissible = false,
@@ -90,17 +91,17 @@ class AppHelper {
 
   /// Show snack bar
   static void showFlushBar(BuildContext context, String message) {
-    Flushbar<void>(
-            message: message, duration: const Duration(milliseconds: 2000), flushbarStyle: FlushbarStyle.GROUNDED)
-        .show(context);
+    // Flushbar<void>(
+    //         message: message, duration: const Duration(milliseconds: 2000), flushbarStyle: FlushbarStyle.GROUNDED)
+    //     .show(context);
   }
 
   /// Show toast
   static void showToast(
     String msg, {
-    Toast toastLength,
-    int timeInSecForIosWeb,
-    Color backgroundColor,
+    Toast? toastLength,
+    int? timeInSecForIosWeb,
+    Color? backgroundColor,
   }) {
     Fluttertoast.showToast(
         msg: msg,

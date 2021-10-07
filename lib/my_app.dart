@@ -1,28 +1,37 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:makerequest/generated/l10n.dart';
+import 'package:makerequest/models/remote/user_response.dart';
 import 'package:makerequest/services/app/app_dialog.dart';
 import 'package:makerequest/services/app/app_loading.dart';
 import 'package:makerequest/services/app/auth_provider.dart';
+
 import 'package:makerequest/services/app/locale_provider.dart';
+import 'package:makerequest/services/app/user_provider.dart';
 import 'package:makerequest/services/cache/cache.dart';
 import 'package:makerequest/services/cache/cache_preferences.dart';
 import 'package:makerequest/services/cache/credential.dart';
 import 'package:makerequest/services/rest_api/api_user.dart';
 import 'package:makerequest/utils/app_extension.dart';
+import 'package:makerequest/utils/app_file.dart';
+import 'package:makerequest/utils/app_log.dart';
 import 'package:makerequest/utils/app_route.dart';
 import 'package:makerequest/utils/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:makerequest/services/cache/cache.dart';
+import 'services/app/auth_provider_firestore.dart';
 
 Future<void> myMain() async {
   /// Start services later
   WidgetsFlutterBinding.ensureInitialized();
 
   /// Force portrait mode
-  await SystemChrome.setPreferredOrientations(<DeviceOrientation>[DeviceOrientation.portraitUp]);
+  await SystemChrome.setPreferredOrientations(
+      <DeviceOrientation>[DeviceOrientation.portraitUp]);
 
   /// Run Application
   runApp(
@@ -34,20 +43,38 @@ Future<void> myMain() async {
             create: (BuildContext context) => Credential(
                   Provider.of(context, listen: false),
                 )),
-        ProxyProvider<Credential, ApiUser>(
+        // Provider<ApiUser>(create: (_) => ApiUser()),
+        ProxyProvider<Credential, ApiUser?>(
             create: (_) => ApiUser(),
-            update: (_, Credential credential, ApiUser userApi) {
-              return userApi..token = credential.token;
-            }),
+
+            update: (_, Credential credential, ApiUser? userApi) {
+             
+              // logger.e("credential ",credential);
+              // logger.e("credential.token ",credential.token);
+              return userApi?..token=credential.token;
+            }
+            ),
         Provider<AppLoading>(create: (_) => AppLoading()),
         Provider<AppDialog>(create: (_) => AppDialog()),
-        ChangeNotifierProvider<LocaleProvider>(create: (BuildContext context) => LocaleProvider()),
-        ChangeNotifierProvider<AppThemeProvider>(create: (BuildContext context) => AppThemeProvider()),
+        Provider<AppFile>(create: (_) => AppFile()),
+        ChangeNotifierProvider<LocaleProvider>(
+            create: (BuildContext context) => LocaleProvider()),
+        ChangeNotifierProvider<AppThemeProvider>(
+            create: (BuildContext context) => AppThemeProvider()),
+        // ChangeNotifierProvider<AuthProvider>(
+        //     create: (BuildContext context) => AuthProvider(
+        //           Provider.of(context, listen: false),
+        //           Provider.of(context, listen: false),
+        //         )),
         ChangeNotifierProvider<AuthProvider>(
             create: (BuildContext context) => AuthProvider(
-                  Provider.of(context, listen: false),
-                  Provider.of(context, listen: false),
-                )),
+                Provider.of(context, listen: false),
+                Provider.of(context, listen: false)!)),
+        ChangeNotifierProvider<AuthProviderFireStore>(
+            create: (BuildContext context) => AuthProviderFireStore()),
+        ChangeNotifierProvider<UserProvider>(
+            create: (BuildContext context) =>
+                UserProvider(Provider.of(context, listen: false))),
       ],
       child: const MyApp(),
     ),
@@ -55,23 +82,26 @@ Future<void> myMain() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  late AuthProviderFireStore _auth;
+
   @override
   void initState() {
     super.initState();
+    _auth = context.read();
 
     /// Init page
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final bool hasCredential = await context.read<Credential>().loadCredential();
-      if (hasCredential) {
-        context.navigator().pushReplacementNamed(AppRoute.routeHome);
-      }
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      UserResponse? currentUser = await _auth.getCurrentUser();
+      Future.delayed(const Duration(milliseconds: 3), () {
+        context.navigator()?.pushReplacementNamed(AppRoute.routeProfile);
+      });
     });
   }
 
@@ -87,7 +117,7 @@ class _MyAppState extends State<MyApp> {
     ///    ScreenUtil().pixelRatio       //Device pixel density
     ///    ScreenUtil().screenWidth   (sdk>=2.6 : 1.sw)    //Device width
     ///    ScreenUtil().screenHeight  (sdk>=2.6 : 1.sh)    //Device height
-    ///    ScreenUtil().bottomBarHeight  //Bottom safe zone distance, suitable for buttons with full screen
+    ///    ScreenUtil().bottomBarHeight  //Bottom safe zone distance, suitable forƒ√ buttons with full screen
     ///    ScreenUtil().statusBarHeight  //Status bar height , Notch will be higher Unit px
     ///    ScreenUtil().textScaleFactor  //System font scaling factor
     ///
@@ -109,7 +139,7 @@ class _MyAppState extends State<MyApp> {
     ///    iPhone 12, 12 Pro                 => 6.1": 390 x 844 (points)
     ///    iPhone 12 Pro Max                 => 6.7": 428 x 926 (points)
     return ScreenUtilInit(
-      designSize: const Size(375, 812),
+      designSize: const Size(414, 896),
       builder: () => MaterialApp(
         navigatorKey: appRoute.navigatorKey,
         locale: localeProvider.locale,
@@ -128,33 +158,10 @@ class _MyAppState extends State<MyApp> {
         ///            const RouteSettings(name: AppRoute.rootPageRoute))
         ///        as MaterialPageRoute<dynamic>)
         ///    .builder(context),
-        initialRoute: AppRoute.routeRoot,
+        initialRoute: AppRoute.routeLogin,
         onGenerateRoute: appRoute.generateRoute,
         navigatorObservers: <NavigatorObserver>[appRoute.routeObserver],
       ),
     );
-
-    // return MaterialApp(
-    //   navigatorKey: appRoute.navigatorKey,
-    //   locale: localeProvider.locale,
-    //   supportedLocales: S.delegate.supportedLocales,
-    //   localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-    //     S.delegate,
-    //     GlobalMaterialLocalizations.delegate,
-    //     GlobalCupertinoLocalizations.delegate,
-    //     GlobalWidgetsLocalizations.delegate,
-    //   ],
-    //   debugShowCheckedModeBanner: false,
-    //   theme: appTheme.buildThemeData(),
-    //   //https://stackoverflow.com/questions/57245175/flutter-dynamic-initial-route
-    //   //https://github.com/flutter/flutter/issues/12454
-    //   //home: (appRoute.generateRoute(
-    //   ///            const RouteSettings(name: AppRoute.rootPageRoute))
-    //   ///        as MaterialPageRoute<dynamic>)
-    //   ///    .builder(context),
-    //   initialRoute: AppRoute.routeRoot,
-    //   onGenerateRoute: appRoute.generateRoute,
-    //   navigatorObservers: <NavigatorObserver>[appRoute.routeObserver],
-    // );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:makerequest/services/safety/base_stateful.dart';
+import 'package:makerequest/utils/app_asset.dart';
 import 'package:makerequest/utils/app_extension.dart';
 import 'package:makerequest/utils/app_style.dart';
 
@@ -19,7 +20,7 @@ import 'package:makerequest/utils/app_style.dart';
 // });
 class WDialogAlert extends StatefulWidget {
   const WDialogAlert({
-    Key key,
+    Key? key,
     this.title,
     this.titleStyle,
     this.content,
@@ -31,16 +32,16 @@ class WDialogAlert extends StatefulWidget {
     this.confirmTitleStyle,
     this.onConfirmPressed,
   }) : super(key: key);
-  final String title;
-  final TextStyle titleStyle;
-  final String content;
-  final TextStyle contentStyle;
-  final String cancelTitle;
-  final TextStyle cancelTitleStyle;
-  final Function() onCancelPressed;
-  final String confirmTitle;
-  final TextStyle confirmTitleStyle;
-  final Function() onConfirmPressed;
+  final String? title;
+  final TextStyle? titleStyle;
+  final String? content;
+  final TextStyle? contentStyle;
+  final String? cancelTitle;
+  final TextStyle? cancelTitleStyle;
+  final Function()? onCancelPressed;
+  final String? confirmTitle;
+  final TextStyle? confirmTitleStyle;
+  final Function()? onConfirmPressed;
 
   @override
   _WDialogAlertState createState() => _WDialogAlertState();
@@ -83,7 +84,7 @@ class _WDialogAlertState extends BaseStateful<WDialogAlert> {
                     normalTextStyle(
                       17.SP,
                       color: const Color(0xFF777982),
-                      fontFamily: appTheme.assets.fontIOSDefault,
+                      fontFamily: AppAssets.fontIOSDefault,
                     ),
               ),
             ),
@@ -100,7 +101,7 @@ class _WDialogAlertState extends BaseStateful<WDialogAlert> {
                     boldTextStyle(
                       17.SP,
                       color: Colors.blue,
-                      fontFamily: appTheme.assets.fontIOSDefault,
+                      fontFamily: AppAssets.fontIOSDefault,
                     ),
               ),
             ),

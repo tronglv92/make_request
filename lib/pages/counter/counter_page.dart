@@ -8,7 +8,7 @@ import 'package:makerequest/widgets/w_keyboard_dismiss.dart';
 import 'package:provider/provider.dart';
 
 class CounterPage extends StatefulWidget {
-  const CounterPage({Key key, this.argument}) : super(key: key);
+  const CounterPage({Key? key,required this.argument}) : super(key: key);
 
   final String argument;
 
@@ -26,7 +26,7 @@ class _CounterPageState extends BaseStateful<CounterPage> {
           AppBar(
             title: const Text('Counter Page'),
           ),
-          Padding(padding: EdgeInsets.only(top: 20.H), child: Text(widget.argument ?? '')),
+          Padding(padding: EdgeInsets.only(top: 20.H), child: Text(widget.argument )),
           Expanded(
             child: Scaffold(
               backgroundColor: Colors.transparent,
