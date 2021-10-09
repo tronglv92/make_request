@@ -1,6 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:makerequest/generated/l10n.dart';
@@ -22,18 +26,76 @@ import 'package:makerequest/utils/app_route.dart';
 import 'package:makerequest/utils/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-import 'package:makerequest/services/cache/cache.dart';
+
 import 'services/app/auth_provider_firestore.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+  print('Handling a background message ${message.messageId}');
+}
+/// Create a [AndroidNotificationChannel] for heads up notifications
+late AndroidNotificationChannel channel;
+
+/// Initialize the [FlutterLocalNotificationsPlugin] package.
+late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 Future<void> myMain() async {
-  /// Start services later
+
+
+  // Start services later
   WidgetsFlutterBinding.ensureInitialized();
 
-  /// Force portrait mode
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  if (!kIsWeb) {
+    channel = const AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      description: 'This channel is used for important notifications.',
+      importance: Importance.high,
+    );
+
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+    // Create an Android Notification Channel.
+    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+      print('User granted provisional permission');
+    } else {
+      print('User declined or has not accepted permission');
+    }
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    // Update the iOS foreground notification presentation options to allow
+    // heads up notifications.
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
+  // Force portrait mode
   await SystemChrome.setPreferredOrientations(
       <DeviceOrientation>[DeviceOrientation.portraitUp]);
 
-  /// Run Application
+  // Run Application
   runApp(
     MultiProvider(
       providers: <SingleChildWidget>[
@@ -48,7 +110,7 @@ Future<void> myMain() async {
             create: (_) => ApiUser(),
 
             update: (_, Credential credential, ApiUser? userApi) {
-             
+
               // logger.e("credential ",credential);
               // logger.e("credential.token ",credential.token);
               return userApi?..token=credential.token;
@@ -98,11 +160,67 @@ class _MyAppState extends State<MyApp> {
 
     /// Init page
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
-      UserResponse? currentUser = await _auth.getCurrentUser();
-      Future.delayed(const Duration(milliseconds: 3), () {
-        context.navigator()?.pushReplacementNamed(AppRoute.routeProfile);
-      });
+      // final UserResponse? currentUser = await _auth.getCurrentUser();
+      // if(currentUser!=null)
+      //   {
+      //     Future.delayed(const Duration(milliseconds: 3), () {
+      //       context.navigator()?.pushReplacementNamed(AppRoute.routeProfile);
+      //     });
+      //   }
+
     });
+
+    // firebase message
+
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage? message) {
+      if (message != null) {
+        logger.d('message ',message);
+      }
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null && !kIsWeb) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                 channelDescription: channel.description,
+
+                icon: 'launch_background',
+              ),
+            ));
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new onMessageOpenedApp event was published!');
+
+    });
+
+    getToken();
+  }
+
+  Future<void> getToken() async{
+    FirebaseMessaging.instance.getToken().then((token) {
+      print('FCM Token : $token');
+    });
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
+      print('FlutterFire Messaging Example: Getting APNs token...');
+      String? token = await FirebaseMessaging.instance.getAPNSToken();
+      print('FlutterFire Messaging Example: Got APNs token: $token');
+    } else {
+      print(
+          'FlutterFire Messaging Example: Getting an APNs token is only supported on iOS and macOS platforms.');
+    }
   }
 
   @override
@@ -158,7 +276,7 @@ class _MyAppState extends State<MyApp> {
         ///            const RouteSettings(name: AppRoute.rootPageRoute))
         ///        as MaterialPageRoute<dynamic>)
         ///    .builder(context),
-        initialRoute: AppRoute.routeLogin,
+        initialRoute: AppRoute.routeSplash,
         onGenerateRoute: appRoute.generateRoute,
         navigatorObservers: <NavigatorObserver>[appRoute.routeObserver],
       ),

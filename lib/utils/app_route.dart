@@ -9,6 +9,8 @@ import 'package:makerequest/pages/login/login_provider.dart';
 import 'package:makerequest/pages/picker_image/picker_image_page.dart';
 import 'package:makerequest/pages/profile/profile_page.dart';
 import 'package:makerequest/pages/splash/splash_page.dart';
+import 'package:makerequest/pages/test/test_bottom_sheet.dart';
+import 'package:makerequest/pages/test/test_page.dart';
 import 'package:makerequest/pages/wellcome/wellcome_page.dart';
 
 import 'package:provider/provider.dart';
@@ -88,39 +90,39 @@ class AppRoute {
   /// Generate route for app here
   Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      // case routeCounter:
-      //   return MaterialPageRoute<dynamic>(
-      //       settings: settings,
-      //       builder: (_) => AppRoute.createProvider(
-      //             (_) => CounterProvider(),
-      //             CounterPage(argument: settings.arguments as String),
-      //           ));
-      //
-      // case routeHome:
-      //   return MaterialPageRoute<dynamic>(
-      //       settings: settings,
-      //       builder: (_) => AppRoute.createProvider(
-      //             (BuildContext context) => HomeProvider(Provider.of(context, listen: false)),
-      //              HomeFbPage(),
-      //           ));
-      // case routeWellCome:
-      //   return MaterialPageRoute<dynamic>(
-      //       settings: settings,
-      //       builder: (_) => WellComePage());
-      case routeRoot:
+      case routeCounter:
+        return MaterialPageRoute<dynamic>(
+            settings: settings,
+            builder: (_) => AppRoute.createProvider(
+                  (_) => CounterProvider(),
+                  CounterPage(argument: settings.arguments as String),
+                ));
+
+      case routeHome:
+        return MaterialPageRoute<dynamic>(
+            settings: settings,
+            builder: (_) => AppRoute.createProvider(
+                  (BuildContext context) => HomeProvider(Provider.of(context, listen: false)),
+                   HomeFbPage(),
+                ));
+      case routeWellCome:
+        return MaterialPageRoute<dynamic>(
+            settings: settings,
+            builder: (_) => WellComePage());
+
       case routeSplash:
         return MaterialPageRoute<dynamic>(
             settings: settings,
             builder: (_) => SplashScreen());
-      // case routeProfile:
-      //   return MaterialPageRoute<dynamic>(
-      //       settings: settings,
-      //       builder: (_) => ProfilePage());
-      // case routeTest:
-      //   return MaterialPageRoute<dynamic>(
-      //       settings: settings,
-      //       builder: (_) => PickerImagePage());
-      // case routeRoot:
+      case routeProfile:
+        return MaterialPageRoute<dynamic>(
+            settings: settings,
+            builder: (_) => ProfilePage());
+      case routeTest:
+        return MaterialPageRoute<dynamic>(
+            settings: settings,
+            builder: (_) => TestPage());
+      case routeRoot:
       case routeLogin:
         return MaterialPageRoute<dynamic>(
             settings: settings,

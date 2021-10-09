@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -24,6 +25,7 @@ import 'package:makerequest/widgets/a_input_form.dart';
 import 'package:makerequest/widgets/a_option_normal.dart';
 import 'package:makerequest/widgets/a_option_selected.dart';
 import 'package:makerequest/widgets/a_popup_picker_image.dart';
+import 'package:makerequest/widgets/image_viewer/image_viewer.dart';
 import 'package:makerequest/widgets/p_appbar_transparency.dart';
 import 'package:makerequest/widgets/w_button_circle.dart';
 import 'package:makerequest/widgets/w_divider_line.dart';
@@ -111,6 +113,7 @@ class _ProfilePageState extends PageStateful<ProfilePage> {
   }
 
   void onCompletedProfile() {
+
     if(_auth.currentUser?.uid==null)
       return;
     final UserResponse user = UserResponse(
@@ -185,35 +188,16 @@ class _ProfilePageState extends PageStateful<ProfilePage> {
         });
   }
   Future<void> onPressPhoto(String photo) async {
-    showDialog<void>(context: context, builder:(BuildContext context){
-      return Container(
-          child: PhotoViewGallery.builder(
-            // scrollPhysics: const BouncingScrollPhysics(),
-            builder: (BuildContext context, int index) {
-              return PhotoViewGalleryPageOptions(
-                imageProvider: CachedNetworkImageProvider(photo),
-                initialScale: PhotoViewComputedScale.contained * 0.8,
-                heroAttributes: PhotoViewHeroAttributes(tag: index),
-              );
-            },
-            itemCount: 3,
-            loadingBuilder: (BuildContext context, ImageChunkEvent? event) => Center(
-              child: Container(
-                width: 20.0,
-                height: 20.0,
-                child: Container(),
-              ),
-            ),
-            backgroundDecoration: const BoxDecoration(
-              color: Colors.black
-            ),
-            pageController: _pageController,
-            onPageChanged: (int index){
-
-            },
-          )
-      );
-    });
+    showCupertinoDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return  ImageViewer(
+          imageProviders: [
+            NetworkImage(photo),
+          ],
+        );
+      },
+    );
   }
   @override
   Widget build(BuildContext context) {
@@ -254,13 +238,16 @@ class _ProfilePageState extends PageStateful<ProfilePage> {
                         SizedBox(height: 30.H),
 
                         Center(
-                          child: ACirclePhoto(
-                            onPressPhoto: (){
-                              onPressPhoto(photoUrl);
-                            },
-                            photoUrl: photoUrl,
-                            showLoading: showLoadingPhoto,
-                              onPressEdit:onPressEdit
+                          child: Hero(
+                            tag: 'profile',
+                            child: ACirclePhoto(
+                              onPressPhoto: (){
+                                onPressPhoto(photoUrl);
+                              },
+                              photoUrl: photoUrl,
+                              showLoading: showLoadingPhoto,
+                                onPressEdit:onPressEdit
+                            ),
                           ),
                         ),
                         SizedBox(height: 30.H),

@@ -43,7 +43,7 @@ class FireStoreDatabase {
   Stream<TodoResponse> todoStream({required String todoId}) =>
       _firestoreService.documentStream(
         path: FireStorePath.todo(uid, todoId),
-        builder: (Map<String, dynamic> data, String documentId) => TodoResponse.fromMap(data, documentId),
+        builder: (Map<String, dynamic>? data, String documentId) => TodoResponse.fromMap(data, documentId),
       );
 
   //Method to retrieve all todos item from the same user based on uid

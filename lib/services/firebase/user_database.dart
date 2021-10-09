@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:makerequest/models/remote/todo_response.dart';
 import 'package:makerequest/models/remote/user_response.dart';
+import 'package:makerequest/utils/app_log.dart';
 
 import 'firestore_path.dart';
 import 'firestore_service.dart';
@@ -41,7 +42,13 @@ class UserDatabase {
   Stream<UserResponse?> userStream(String uid) {
     return _fireStoreService.documentStream(
       path: FireStorePath.user(uid),
-      builder: (Map<String, dynamic> data, String documentId) => data!=null?UserResponse.fromJson(data):null,
+      builder: (Map<String, dynamic>? data, String documentId) {
+        logger.e('user stream ',data);
+        if(data==null)
+          return null;
+        return UserResponse.fromJson(data);
+
+      },
     );
   }
 

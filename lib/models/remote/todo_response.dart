@@ -12,10 +12,10 @@ class TodoResponse {
         required this.extraNote,
         required this.complete});
 
-  factory TodoResponse.fromMap(Map<String, dynamic> data, String documentId) {
-    final String task = data['task'] as String;
-    final String extraNote = data['extraNote'] as String;
-    final bool complete = data['complete'] as bool;
+  factory TodoResponse.fromMap(Map<String, dynamic>? data, String documentId) {
+    final String task = data?['task'] as String;
+    final String extraNote = data?['extraNote'] as String;
+    final bool complete = data?['complete'] as bool;
 
     return TodoResponse(
         id: documentId, task: task, extraNote: extraNote, complete: complete);

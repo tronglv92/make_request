@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 /// AppDialog.hide(context);
 ///
 class AppDialog {
-  late BuildContext? _dialogContext;
+   BuildContext? _dialogContext;
   bool requestClose = false;
 
   /// Show alert dialog shortcut

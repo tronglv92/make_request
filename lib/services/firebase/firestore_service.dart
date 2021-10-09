@@ -71,13 +71,14 @@ class FireStoreService {
 
   Stream<T> documentStream<T>({
     required String path,
-    required T builder(Map<String, dynamic> data, String documentID),
+    required T builder(Map<String, dynamic>? data, String documentID),
   }) {
-    // ignore: always_specify_types
-    final DocumentReference reference = FirebaseFirestore.instance.doc(path);
-    // ignore: always_specify_types
-    final Stream<DocumentSnapshot> snapshots = reference.snapshots();
-    return snapshots.map((DocumentSnapshot<Object?> snapshot) =>
-        builder(snapshot.data() as Map<String, dynamic>, snapshot.id));
+
+    final  DocumentReference<Map<String, dynamic>> reference = FirebaseFirestore.instance.doc(path);
+
+    final  Stream<DocumentSnapshot<Map<String, dynamic>>> snapshots = reference.snapshots();
+    return snapshots.map((DocumentSnapshot<Map<String, dynamic>> snapshot) {
+      return builder(snapshot.data(), snapshot.id);
+    });
   }
 }

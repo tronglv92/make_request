@@ -17,8 +17,8 @@ class UserResponse extends Equatable{
       : uid = data['uid'] as String,
         displayName = data['displayName'] as String,
         email = data['email'] as String,
-        phoneNumber = data['phoneNumber'] as String,
-        photoUrl = data['photoUrl'] as String,
+        phoneNumber = data['phoneNumber']!=null?data['phoneNumber'] as String:null,
+        photoUrl = data['photoUrl']!=null?data['photoUrl'] as String:null,
         roleId = data['roleId'] as int;
   UserResponse.fromUserFirebase(User user)
       : uid = user.uid,
