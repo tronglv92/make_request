@@ -10,7 +10,7 @@ class ACirclePhoto extends StatefulWidget {
       {Key? key,
       required this.photoUrl,
       required this.onPressPhoto,
-        required this.onPressEdit,
+      required this.onPressEdit,
       this.showLoading = false})
       : super(key: key);
   final String photoUrl;
@@ -22,15 +22,13 @@ class ACirclePhoto extends StatefulWidget {
   _ACirclePhotoState createState() => _ACirclePhotoState();
 }
 
-class _ACirclePhotoState extends State<ACirclePhoto>
-    with TickerProviderStateMixin {
+class _ACirclePhotoState extends State<ACirclePhoto> {
   @override
   Widget build(BuildContext context) {
     final double width = 120.W;
     return WButtonCircle(
       width: width,
-      onPressed: widget.showLoading==false?widget.onPressPhoto:null,
-
+      onPressed: widget.showLoading == false ? widget.onPressPhoto : null,
       color: Colors.grey,
       child: Stack(
         children: [
@@ -46,9 +44,6 @@ class _ACirclePhotoState extends State<ACirclePhoto>
                     SpinKitCircle(
                   color: Colors.white,
                   size: 20.0.W,
-                  controller: AnimationController(
-                      vsync: this,
-                      duration: const Duration(milliseconds: 1200)),
                 ),
                 errorWidget: (BuildContext context, String url, dynamic error) {
                   logger.e('error ', error);
@@ -64,11 +59,15 @@ class _ACirclePhotoState extends State<ACirclePhoto>
             right: 10.W,
             bottom: 10.W,
             child: WButtonCircle(
-              onPressed:widget.onPressEdit,
+              onPressed: widget.onPressEdit,
               width: 30.W,
               color: Colors.black.withOpacity(0.5),
               child: Center(
-                child: Icon(Icons.edit,color: Colors.black,size: 20.W,),
+                child: Icon(
+                  Icons.edit,
+                  color: Colors.black,
+                  size: 20.W,
+                ),
               ),
             ),
           ),
@@ -77,10 +76,7 @@ class _ACirclePhotoState extends State<ACirclePhoto>
                 child: SpinKitCircle(
               color: Colors.white,
               size: 20.0.W,
-              controller: AnimationController(
-                  vsync: this, duration: const Duration(milliseconds: 1200)),
             )),
-
         ],
       ),
     );

@@ -37,18 +37,14 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 Future<void> myMain() async {
-
-
   // Start services later
   WidgetsFlutterBinding.ensureInitialized();
 
-
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   if (!kIsWeb) {
-
-
     // Create an Android Notification Channel.
-    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+    NotificationSettings settings =
+        await FirebaseMessaging.instance.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -60,12 +56,12 @@ Future<void> myMain() async {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted permission');
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
       print('User granted provisional permission');
     } else {
       print('User declined or has not accepted permission');
     }
-
 
     // Update the iOS foreground notification presentation options to allow
     // heads up notifications.
@@ -94,14 +90,11 @@ Future<void> myMain() async {
         // Provider<ApiUser>(create: (_) => ApiUser()),
         ProxyProvider<Credential, ApiUser?>(
             create: (_) => ApiUser(),
-
             update: (_, Credential credential, ApiUser? userApi) {
-
               // logger.e("credential ",credential);
               // logger.e("credential.token ",credential.token);
-              return userApi?..token=credential.token;
-            }
-            ),
+              return userApi?..token = credential.token;
+            }),
         Provider<AppLoading>(create: (_) => AppLoading()),
         Provider<AppDialog>(create: (_) => AppDialog()),
         Provider<AppFile>(create: (_) => AppFile()),
@@ -138,49 +131,44 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late AuthProviderFireStore _auth;
-
+  late UserProvider _userProvider;
+  String? fcmToken;
   @override
   void initState() {
     super.initState();
     _auth = context.read();
+    _userProvider = context.read();
 
     /// Init page
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
-      // final UserResponse? currentUser = await _auth.getCurrentUser();
-      // if(currentUser!=null)
-      //   {
-      //     Future.delayed(const Duration(milliseconds: 3), () {
-      //       context.navigator()?.pushReplacementNamed(AppRoute.routeProfile);
-      //     });
-      //   }
-
+      await initFirebase();
+      final UserResponse? currentUser = await _auth.getCurrentUser();
+      if (currentUser != null) {
+        //save fcm token
+        await _userProvider.updateFcmToken(uuid: currentUser.uid);
+        context.navigator()?.pushReplacementNamed(AppRoute.routeProfile);
+      }
     });
 
     // firebase message
-
-
-
-
-
-    initFirebase();
-
-
   }
-  Future<void> initFirebase() async{
-    String? token=await FirebaseMessaging.instance.getToken();
-    print('FCM Token : $token');
+
+  Future<void> initFirebase() async {
+    fcmToken = await FirebaseMessaging.instance.getToken();
+    //update value fcm token
+    _userProvider.fcmToken = fcmToken;
+
+    print('FCM Token : $fcmToken');
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage? message) {
-
-      logger.d('message ',message);
+      logger.d('message ', message);
     });
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      logger.d('onMessage !',message);
+      logger.d('onMessage !', message);
     });
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('A new onMessageOpenedApp event was published!');
-
     });
     if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.macOS) {
@@ -192,7 +180,6 @@ class _MyAppState extends State<MyApp> {
           'FlutterFire Messaging Example: Getting an APNs token is only supported on iOS and macOS platforms.');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {

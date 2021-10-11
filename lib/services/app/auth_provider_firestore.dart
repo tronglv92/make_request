@@ -10,6 +10,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:makerequest/models/remote/error_response.dart';
 import 'package:makerequest/models/remote/user_response.dart';
+import 'package:makerequest/services/firebase/fcm_database.dart';
 import 'package:makerequest/services/firebase/user_database.dart';
 import 'package:makerequest/services/safety/change_notifier_safety.dart';
 import 'package:makerequest/utils/app_log.dart';
@@ -22,6 +23,7 @@ class AuthProviderFireStore extends ChangeNotifierSafety {
     //initialise object
     _auth = FirebaseAuth.instance;
     _userDb = UserDatabase();
+   
     //listener for authentication changes such as user sign in and sign out
     _auth.authStateChanges().listen(onAuthStateChanged);
   }
@@ -29,6 +31,7 @@ class AuthProviderFireStore extends ChangeNotifierSafety {
   //Firebase Auth object
   late FirebaseAuth _auth;
   late UserDatabase _userDb;
+  
   AccountType accountType = AccountType.EMAIL;
 
   //Default status
@@ -36,49 +39,46 @@ class AuthProviderFireStore extends ChangeNotifierSafety {
   // Stream<Future<UserResponse>> get currentUser => _auth.authStateChanges().map(_userFromFirebase);
   UserResponse? currentUser;
 
-  Future<UserResponse?> getCurrentUser() async {
+  Future<UserResponse?> getCurrentUser({String? fcmToken}) async {
     final User? user = FirebaseAuth.instance.currentUser;
+
+    await setCurrentUser(user);
+    return currentUser;
+  }
+
+  Future<void> setCurrentUser(User? user) async {
     if (user == null) {
-      setCurrentUser(null);
+      currentUser = null;
+      notifyListeners();
+      return;
     } else {
       UserResponse? userDb = await _userDb.userStream(user.uid).first;
 
+      // add new profile if new user
       if (userDb == null) {
         userDb = UserResponse.fromUserFirebase(user);
         _userDb.setUser(user: userDb, uid: user.uid);
       }
-      setCurrentUser(userDb);
+      currentUser = userDb;
+      
+      notifyListeners();
+
+     
     }
-    return currentUser;
   }
 
-  void setCurrentUser(UserResponse? user) {
+  void updateUser(UserResponse? user) {
     currentUser = user;
     notifyListeners();
   }
 
-  //Create user object based on the given User
-  Future<UserResponse?> _userFromFirebase(User? user) async {
-    UserResponse? userDb;
-    if (user != null) {
-      userDb = await _userDb.userStream(user.uid).first;
-
-      if (userDb == null) {
-        userDb = UserResponse.fromUserFirebase(user);
-        _userDb.setUser(user: userDb, uid: user.uid);
-      }
-    }
-    // await Future<void>.delayed(const Duration(seconds: 5));
-    logger.e('onAuthStateChanged user = ', userDb);
-    return userDb;
-  }
+ 
 
   //
   // //Method to detect live auth changes such as user sign in and sign out
   Future<void> onAuthStateChanged(User? firebaseUser) async {
-    currentUser = await _userFromFirebase(firebaseUser);
-
-    notifyListeners();
+    logger.e('onAuthStateChanged user = ', firebaseUser);
+    await setCurrentUser(firebaseUser);
   }
 
   // //Method for new user registration using email and password
@@ -103,11 +103,11 @@ class AuthProviderFireStore extends ChangeNotifierSafety {
   // }
 
   //Method to handle user sign in using email and password
-  Future<bool> signInWithEmailAndPassword(String email, String password) async {
+  Future<UserCredential> signInWithEmailAndPassword(String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
       accountType = AccountType.EMAIL;
-      return true;
+      return userCredential;
     } on FirebaseAuthException catch (e) {
       print('Error on the sign in = ');
       print('Failed with error code: ${e.code}');
@@ -156,6 +156,7 @@ class AuthProviderFireStore extends ChangeNotifierSafety {
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithCredential(credential);
       accountType = AccountType.GOOGLE;
+     
       return userCredential;
     } on FirebaseAuthException catch (e) {
       print('Error on the sign in = ');

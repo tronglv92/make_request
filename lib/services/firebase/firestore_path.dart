@@ -10,4 +10,5 @@ class FireStorePath {
   static String todos(String uid) => 'users/$uid/todos';
 
   static String user(String uid) => 'users/$uid';
+  static String fcmToken(String uid) => 'fcmTokens/$uid';
 }

@@ -7,6 +7,7 @@ import 'package:makerequest/services/app/app_dialog.dart';
 import 'package:makerequest/services/app/app_loading.dart';
 import 'package:makerequest/services/app/auth_provider.dart';
 import 'package:makerequest/services/app/auth_provider_firestore.dart';
+import 'package:makerequest/services/app/user_provider.dart';
 
 import 'package:makerequest/services/safety/page_stateful.dart';
 import 'package:makerequest/utils/app_asset.dart';
@@ -41,7 +42,8 @@ class _LoginPageState extends PageStateful<LoginPage>
 
   // late LoginProvider loginProvider;
   late AuthProviderFireStore _authProviderFireStore;
-  late AuthProvider authProvider;
+  late UserProvider _userProvider;
+
   bool isAvailable = false;
 
   @override
@@ -49,7 +51,7 @@ class _LoginPageState extends PageStateful<LoginPage>
     super.initDependencies(context);
     // loginProvider = Provider.of(context, listen: false);
     _authProviderFireStore = Provider.of(context, listen: false);
-    authProvider=Provider.of(context, listen: false);
+    _userProvider = context.read();
   }
 
   @override
@@ -92,16 +94,16 @@ class _LoginPageState extends PageStateful<LoginPage>
   }
 
   Future<void> onPressLogin() async {
-    await apiCallSafety<bool>(
+    await apiCallSafety<UserCredential>(
       () => _authProviderFireStore.signInWithEmailAndPassword(
           _emailController.text, _passwordController.text),
       onStart: () async {
         AppLoading.show(context);
       },
-      onCompleted: (bool status, bool? res) async {
+      onCompleted: (bool status, UserCredential? res) async {
         AppLoading.hide(context);
         if (status == true) {
-          Navigator.of(context).pushNamed(AppRoute.routeHome);
+          onLoginSuccess(res);
         }
       },
     );
@@ -134,7 +136,7 @@ class _LoginPageState extends PageStateful<LoginPage>
       onCompleted: (bool status, UserCredential? res) async {
         AppLoading.hide(context);
         if (status == true) {
-          onLoginSuccess();
+          onLoginSuccess(res);
         }
       },
     );
@@ -149,7 +151,7 @@ class _LoginPageState extends PageStateful<LoginPage>
       onCompleted: (bool status, UserCredential? res) async {
         AppLoading.hide(context);
         if (status == true && res != null) {
-          onLoginSuccess();
+          onLoginSuccess(res);
         }
       },
     );
@@ -164,13 +166,18 @@ class _LoginPageState extends PageStateful<LoginPage>
       onCompleted: (bool status, UserCredential? res) async {
         AppLoading.hide(context);
         if (status == true && res != null) {
-          onLoginSuccess();
+          onLoginSuccess(res);
         }
       },
     );
   }
 
-  Future<void> onLoginSuccess() async {
+  Future<void> onLoginSuccess(UserCredential? userCredential) async {
+    if (userCredential != null && userCredential.user != null) {
+      // save and update fcm token
+      await _userProvider.updateFcmToken(uuid: userCredential.user?.uid ?? '');
+    }
+
     Navigator.of(context).pushNamed(AppRoute.routeProfile);
   }
 
@@ -181,9 +188,9 @@ class _LoginPageState extends PageStateful<LoginPage>
     if (error is ErrorResponse) {
       logger.e("error 1 ", error);
       final ErrorResponse errorResponse = error;
-      await AppDialog.show(context, errorResponse.message??'');
+      await AppDialog.show(context, errorResponse.message ?? '');
     } else {
-      logger.e("error 2 ", error);
+      logger.e('error 2 ', error);
       await AppDialog.show(context, error.toString());
     }
     return 0;

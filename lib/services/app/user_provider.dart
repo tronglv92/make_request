@@ -5,6 +5,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:makerequest/models/remote/user_response.dart';
 import 'package:makerequest/services/app/auth_provider_firestore.dart';
+import 'package:makerequest/services/firebase/fcm_database.dart';
 import 'package:makerequest/services/firebase/user_database.dart';
 import 'package:makerequest/services/safety/change_notifier_safety.dart';
 import 'package:makerequest/utils/app_constant.dart';
@@ -14,13 +15,21 @@ import 'package:makerequest/utils/app_log.dart';
 class UserProvider extends ChangeNotifierSafety {
   UserProvider(AuthProviderFireStore auth) {
     _userDb = UserDatabase();
+    _fcmDb = FcmDatabase();
     _auth = auth;
     _picker = ImagePicker();
   }
 
   late UserDatabase _userDb;
+  late FcmDatabase _fcmDb;
   late AuthProviderFireStore _auth;
   late ImagePicker _picker;
+
+  // FCM TOKEN
+  String? _fcmToken;
+  set fcmToken(String? fmcToken) {
+    _fcmToken = fmcToken;
+  }
 
   @override
   void resetState() {
@@ -30,8 +39,16 @@ class UserProvider extends ChangeNotifierSafety {
   Future<void> updateProfile(UserResponse userResponse) async {
     logger.e('updateProfile userResponse ', userResponse);
     await _userDb.setUser(user: userResponse, uid: userResponse.uid);
-    _auth.setCurrentUser(userResponse);
+    _auth.updateUser(userResponse);
     return;
+  }
+
+  Future<void> updateFcmToken({required String uuid}) async {
+    if (_fcmToken != null) {
+      await _fcmDb.updateFcmUser(userId: uuid, fcmToken: _fcmToken!);
+    } else {
+      print('Can not update fcmToken because fcmToken is nul');
+    }
   }
 
   Future<String?> updatePhotoUser(
@@ -45,7 +62,7 @@ class UserProvider extends ChangeNotifierSafety {
     final String url = await AppFile.uploadFile(
         context: context, image: image, destination: PHOTO_PROFILE);
     final UserResponse? user = await _userDb.userStream(uuid).first;
-    if(user==null) return null;
+    if (user == null) return null;
     user.photoUrl = url;
     await _userDb.updatePhoto(user: user, uuid: uuid);
     return url;
