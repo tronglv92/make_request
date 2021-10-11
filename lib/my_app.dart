@@ -4,7 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:makerequest/generated/l10n.dart';
@@ -35,11 +35,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('Handling a background message ${message.messageId}');
 }
-/// Create a [AndroidNotificationChannel] for heads up notifications
-late AndroidNotificationChannel channel;
 
-/// Initialize the [FlutterLocalNotificationsPlugin] package.
-late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 Future<void> myMain() async {
 
 
@@ -49,14 +45,7 @@ Future<void> myMain() async {
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   if (!kIsWeb) {
-    channel = const AndroidNotificationChannel(
-      'high_importance_channel', // id
-      'High Importance Notifications', // title
-      description: 'This channel is used for important notifications.',
-      importance: Importance.high,
-    );
 
-    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
     // Create an Android Notification Channel.
     NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
@@ -76,10 +65,7 @@ Future<void> myMain() async {
     } else {
       print('User declined or has not accepted permission');
     }
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
+
 
     // Update the iOS foreground notification presentation options to allow
     // heads up notifications.
@@ -172,56 +158,41 @@ class _MyAppState extends State<MyApp> {
 
     // firebase message
 
+
+
+
+
+    initFirebase();
+
+
+  }
+  Future<void> initFirebase() async{
+    String? token=await FirebaseMessaging.instance.getToken();
+    print('FCM Token : $token');
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage? message) {
-      if (message != null) {
-        logger.d('message ',message);
-      }
-    });
 
+      logger.d('message ',message);
+    });
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
-      if (notification != null && android != null && !kIsWeb) {
-        flutterLocalNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                 channelDescription: channel.description,
-
-                icon: 'launch_background',
-              ),
-            ));
-      }
+      logger.d('onMessage !',message);
     });
-
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('A new onMessageOpenedApp event was published!');
 
     });
-
-    getToken();
-  }
-
-  Future<void> getToken() async{
-    FirebaseMessaging.instance.getToken().then((token) {
-      print('FCM Token : $token');
-    });
     if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.macOS) {
       print('FlutterFire Messaging Example: Getting APNs token...');
-      String? token = await FirebaseMessaging.instance.getAPNSToken();
-      print('FlutterFire Messaging Example: Got APNs token: $token');
+      String? aPNSToken = await FirebaseMessaging.instance.getAPNSToken();
+      print('FlutterFire Messaging Example: Got APNs token: $aPNSToken');
     } else {
       print(
           'FlutterFire Messaging Example: Getting an APNs token is only supported on iOS and macOS platforms.');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -276,7 +247,7 @@ class _MyAppState extends State<MyApp> {
         ///            const RouteSettings(name: AppRoute.rootPageRoute))
         ///        as MaterialPageRoute<dynamic>)
         ///    .builder(context),
-        initialRoute: AppRoute.routeSplash,
+        initialRoute: AppRoute.routeTest,
         onGenerateRoute: appRoute.generateRoute,
         navigatorObservers: <NavigatorObserver>[appRoute.routeObserver],
       ),
